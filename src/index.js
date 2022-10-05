@@ -23,12 +23,11 @@ app.get('/talker/:id', async (req, res) => {
     return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
   return res.status(200).json(talkerId);
-});
-
+}); 
 
 app.post('/login', async (req, res) => {
   const newToken = randomToken();
-  return res.status(200).json({token: newToken});
+  return res.status(200).json({ token: newToken });
 });
 
 // não remova esse endpoint, e para o avaliador funcionar
