@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { readTalkerData } = require('./utils/fsUtils');
 const { randomToken } = require('./utils/token');
+const { validateEmailAndPassword } = require('./middlewares/validations');
 
 const app = express();
 app.use(bodyParser.json());
@@ -13,7 +14,7 @@ const PORT = '3000';
 
 app.get('/talker', async (req, res) => {
   const talkers = await readTalkerData(); 
-  return res.status(200).json(talkers); 
+  return res.status(200).json(talkers);
   });
 
 app.get('/talker/:id', async (req, res) => {
@@ -25,7 +26,7 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(200).json(talkerId);
 }); 
 
-app.post('/login', async (req, res) => {
+app.post('/login', validateEmailAndPassword, async (req, res) => {
   const newToken = randomToken();
   return res.status(200).json({ token: newToken });
 });
