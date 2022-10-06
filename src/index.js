@@ -1,8 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { readTalkerData } = require('./utils/fsUtils');
+const { readTalkerData, writeNewTalkerData } = require('./utils/fsUtils');
 const { randomToken } = require('./utils/token');
-const { validateEmailAndPassword } = require('./middlewares/validations');
+const { validateEmailAndPassword,
+      validateToken,
+      validateName,
+      validateAge,
+      validateFieldTalk,
+      validateWatchedAt,
+      validateRate } = require('./middlewares/validations');
 
 const app = express();
 app.use(bodyParser.json());
@@ -29,6 +35,18 @@ app.get('/talker/:id', async (req, res) => {
 app.post('/login', validateEmailAndPassword, async (req, res) => {
   const newToken = randomToken();
   return res.status(200).json({ token: newToken });
+});
+
+app.post('/talker',
+validateToken,
+validateName,
+validateAge,
+validateFieldTalk,
+validateWatchedAt,
+validateRate,
+async (req, res) => {
+  const newElement = await writeNewTalkerData(req.body);
+  return res.status(201).json(newElement);
 });
 
 // não remova esse endpoint, e para o avaliador funcionar
