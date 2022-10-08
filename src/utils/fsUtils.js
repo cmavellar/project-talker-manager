@@ -12,7 +12,6 @@ async function readTalkerData() {
         return [];
 }
 }
-readTalkerData();
 
 async function writeNewTalkerData(newTalker) {
     try {
@@ -26,9 +25,41 @@ async function writeNewTalkerData(newTalker) {
     }
 }
 
-writeNewTalkerData();
+async function editTalkerData(id, editedTalkerData) {
+    try {
+        const oldData = await readTalkerData();
+        const editedTalker = { id, ...editedTalkerData };
+        const editTalkers = oldData.reduce((
+        talkersList, currentTalker,
+) => {
+            if (currentTalker.id === editedTalker.id) return [...talkersList, editedTalker];
+        return [...talkersList, currentTalker];
+        }, []);
+
+    const editData = JSON.stringify(editTalkers);
+    await fs.writeFile(path.resolve('src/talker.json'), editData);
+        return editedTalker;
+        } catch (error) {
+        console.error(`Erro na escrita do arquivo: ${error}`);
+}
+}
+
+async function deleteTalkerId(id) {
+    try {
+        const oldData = await readTalkerData();
+        const editedData = oldData.filter((currentTalker) => currentTalker.id !== id);
+
+        const deleteData = JSON.stringify(editedData);
+        await fs.writeFile(path.resolve('src/talker.json'), deleteData);
+        console.log(`Deletou o talker com o id ${id}`);
+    } catch (error) {
+        console.error(`Erro na escrita do arquivo: ${error}`);
+}
+}
 
 module.exports = {
     readTalkerData,
     writeNewTalkerData,
+    editTalkerData,
+    deleteTalkerId,
 };

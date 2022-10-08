@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { readTalkerData, writeNewTalkerData } = require('./utils/fsUtils');
+const { readTalkerData, writeNewTalkerData,
+ editTalkerData, deleteTalkerId } = require('./utils/fsUtils');
 const { randomToken } = require('./utils/token');
 const { validateEmailAndPassword,
       validateToken,
@@ -22,6 +23,17 @@ app.get('/talker', async (req, res) => {
   const talkers = await readTalkerData(); 
   return res.status(200).json(talkers);
   });
+
+app.get('/talker/search', validateToken, async (req, res) => {
+  const { q } = req.query; 
+  const talkers = await readTalkerData();
+
+  if (!q) {
+    return res.status(200).json(talkers);
+  }
+  const talkersData = talkers.filter((talker) => talker.name.includes(q));
+    return res.status(200).json(talkersData);
+});
 
 app.get('/talker/:id', async (req, res) => {
   const talkers = await readTalkerData();
@@ -47,6 +59,28 @@ validateRate,
 async (req, res) => {
   const newElement = await writeNewTalkerData(req.body);
   return res.status(201).json(newElement);
+});
+
+app.put('/talker/:id',
+validateToken,
+validateName,
+validateAge,
+validateFieldTalk,
+validateWatchedAt,
+validateRate,
+async (req, res) => {
+  const { id } = req.params;
+  const editTalker = req.body;
+  const editData = await editTalkerData(Number(id), editTalker);
+
+  return res.status(200).json(editData);
+});
+
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const { id } = req.params;
+  await deleteTalkerId(Number(id));
+
+  return res.status(204).end();
 });
 
 // não remova esse endpoint, e para o avaliador funcionar
